@@ -105,7 +105,7 @@ try:
   temp_dir = os.path.join(TEMP_ROOT, session_uuid)
   os.makedirs(temp_dir)
   os.chdir(temp_dir)
-  temp_dir = os.path.join(TEMP_ROOT2, session_uuid)
+  temp_dir2 = os.path.join(TEMP_ROOT2, session_uuid)
   os.makedirs(temp_dir2)
   os.chdir(temp_dir2)
   
