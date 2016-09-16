@@ -219,15 +219,8 @@ try:
     #  attempting to add x264 compression to the stripped commercial file before overiding the origional
     #  ffmpeg -i input -c:v libx264 -preset slow -crf 22 -c:a copy output.mkv
     #
-    logging.info('Going to compress and convert to x264 %s' % (temp_dir, video_basename))
-    try:
-      cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', os.path.join(temp_dir_b, video_basename)]
-      logging.info('[ffmpeg] Command: %s' % cmd)
-      subprocess.call(cmd)
-
-    except Exception, e:
-      logging.error('Something went wrong during compression: %s' % e)
-      cleanup_and_exit(temp_dir_b, SAVE_ALWAYS or SAVE_FORENSICS)
+    cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', os.path.join(temp_dir_b, video_basename)]
+    subprocess.call(cmd)
     #
     #
     #
