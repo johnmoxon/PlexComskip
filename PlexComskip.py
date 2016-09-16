@@ -102,12 +102,12 @@ except: pass
 # On to the actual work.
 try:
   video_path = sys.argv[1]
+  temp_dir_b = os.path.join(TEMP_ROOT_b, session_uuid)
+  os.makedirs(temp_dir_b)
+  # os.chdir(temp_dir_b)
   temp_dir = os.path.join(TEMP_ROOT, session_uuid)
   os.makedirs(temp_dir)
   os.chdir(temp_dir)
-  temp_dir_b = os.path.join(TEMP_ROOT_b, session_uuid)
-  os.makedirs(temp_dir_b)
-  os.chdir(temp_dir_b)
   
   logging.info('Using session ID: %s' % session_uuid)
   logging.info('Using temp dir: %s' % temp_dir)
