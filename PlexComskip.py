@@ -215,15 +215,13 @@ try:
     logging.info('Output file size was too similar (doesn\'t look like we did much); we won\'t replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
     cleanup_and_exit(temp_dir, SAVE_ALWAYS)
   elif input_size and 1.1 > float(output_size) / float(input_size) > 0.5:
-    logging.info('Output file size looked sane, we\'ll replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
-    logging.info('Copying the output file into place: %s -> %s' % (video_basename, original_video_dir))
     #
     #  attempting to add x264 compression to the stripped commercial file before overiding the origional
     #  ffmpeg -i input -c:v libx264 -preset slow -crf 22 -c:a copy output.mkv
     #
     logging.info('Going to compress and convert to x264 %s' % (temp_dir, video_basename))
     try:
-      cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', os.path.join(temp_dir_b, video_basename)]
+      cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v ', 'libx264 ', '-preset ', 'slow ', '-crf ', '22 ', '-c:a ', 'copy ', os.path.join(temp_dir_b, video_basename)]
       logging.info('[ffmpeg] Command: %s' % cmd)
       subprocess.call(cmd)
 
@@ -233,7 +231,9 @@ try:
     #
     #
     #
-  
+    logging.info('Output file size looked sane, we\'ll replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
+    logging.info('Copying the output file into place: %s -> %s' % (video_basename, original_video_dir))
+    
     shutil.copy(os.path.join(temp_dir_b, video_basename), original_video_dir)
     # shutil.copy(os.path.join(temp_dir, video_basename), original_video_dir)
     cleanup_and_exit(temp_dir, SAVE_ALWAYS)
