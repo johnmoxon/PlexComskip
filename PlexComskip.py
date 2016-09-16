@@ -194,6 +194,9 @@ try:
   elif input_size and 1.1 > float(output_size) / float(input_size) > 0.5:
     logging.info('Output file size looked sane, we\'ll replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
     logging.info('Copying the output file into place: %s -> %s' % (video_basename, original_video_dir))
+    cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v libx264 -preset slow -crf 22', '-c:a copy', os.path.join(temp_dir, video_basename)]
+    logging.info('[ffmpeg] Command: %s' % cmd)
+    subprocess.call(cmd)
     shutil.copy(os.path.join(temp_dir, video_basename), original_video_dir)
     cleanup_and_exit(temp_dir, SAVE_ALWAYS)
   else:
