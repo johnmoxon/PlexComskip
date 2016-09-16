@@ -26,6 +26,9 @@ FFMPEG_PATH = os.path.expandvars(os.path.expanduser(config.get('Helper Apps', 'f
 LOG_FILE_PATH = os.path.expandvars(os.path.expanduser(config.get('Logging', 'logfile-path')))
 CONSOLE_LOGGING = config.getboolean('Logging', 'console-logging')
 TEMP_ROOT = os.path.expandvars(os.path.expanduser(config.get('File Manipulation', 'temp-root')))
+# added temp_root_b to store compressed temp mkv
+TEMP_ROOT_b = os.path.expandvars(os.path.expanduser(config.get('File Manipulation', 'temp-root_b')))
+#
 COPY_ORIGINAL = config.getboolean('File Manipulation', 'copy-original')
 SAVE_ALWAYS = config.getboolean('File Manipulation', 'save-always')
 SAVE_FORENSICS = config.getboolean('File Manipulation', 'save-forensics')
@@ -70,6 +73,22 @@ def cleanup_and_exit(temp_dir, keep_temp=False):
 
   # Exit cleanly.
   logging.info('Done processing!')
+  sys.exit
+  
+# Clean up after ourselves and exit.
+def cleanup_and_exit(temp_dir_b, keep_temp=False):
+  if keep_temp:
+    logging.info('Leaving temp files in: %s' % temp_dir_b)
+  else:
+    try:
+      os.chdir(os.path.expanduser('~'))  # Get out of the temp dir before we nuke it (causes issues on NTFS)
+      shutil.rmtree(temp_dir_b)
+    except Exception, e:
+      logging.error('Problem whacking temp dir: %s' % temp_dir_b)
+      logging.error(str(e))
+
+  # Exit cleanly.
+  logging.info('Done processing!')
   sys.exit(0)
 
 # If we're in a git repo, let's see if we can report our sha.
@@ -83,10 +102,13 @@ except: pass
 # On to the actual work.
 try:
   video_path = sys.argv[1]
+  temp_dir_b = os.path.join(TEMP_ROOT_b, session_uuid)
+  os.makedirs(temp_dir_b)
+  # os.chdir(temp_dir_b)
   temp_dir = os.path.join(TEMP_ROOT, session_uuid)
   os.makedirs(temp_dir)
   os.chdir(temp_dir)
-
+  
   logging.info('Using session ID: %s' % session_uuid)
   logging.info('Using temp dir: %s' % temp_dir)
   logging.info('Using input file: %s' % video_path)
@@ -116,6 +138,7 @@ try:
 except Exception, e:
   logging.error('Something went wrong during comskip analysis: %s' % e)
   cleanup_and_exit(temp_dir, SAVE_ALWAYS or SAVE_FORENSICS)
+  cleanup_and_exit(temp_dir_b, SAVE_ALWAYS or SAVE_FORENSICS)
 
 edl_file = os.path.join(temp_dir, video_name + '.edl')
 logging.info('Using EDL: ' + edl_file)
@@ -192,13 +215,27 @@ try:
     logging.info('Output file size was too similar (doesn\'t look like we did much); we won\'t replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
     cleanup_and_exit(temp_dir, SAVE_ALWAYS)
   elif input_size and 1.1 > float(output_size) / float(input_size) > 0.5:
+    #
+    #  attempting to add x264 compression to the stripped commercial file before overiding the origional
+    #  ffmpeg -i input -c:v libx264 -preset slow -crf 22 -c:a copy output.mkv
+    #
+    cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', os.path.join(temp_dir_b, video_basename)]
+    subprocess.call(cmd)
+    #
+    #
+    #
     logging.info('Output file size looked sane, we\'ll replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
     logging.info('Copying the output file into place: %s -> %s' % (video_basename, original_video_dir))
-    shutil.copy(os.path.join(temp_dir, video_basename), original_video_dir)
+    
+    shutil.copy(os.path.join(temp_dir_b, video_basename), original_video_dir)
+    # shutil.copy(os.path.join(temp_dir, video_basename), original_video_dir)
     cleanup_and_exit(temp_dir, SAVE_ALWAYS)
+    cleanup_and_exit(temp_dir_b, SAVE_ALWAYS)
   else:
     logging.info('Output file size looked wonky (too big or too small); we won\'t replace the original: %s -> %s' % (sizeof_fmt(input_size), sizeof_fmt(output_size)))
     cleanup_and_exit(temp_dir, SAVE_ALWAYS or SAVE_FORENSICS)
+    cleanup_and_exit(temp_dir_b, SAVE_ALWAYS or SAVE_FORENSICS)
 except Exception, e:
   logging.error('Something went wrong during sanity check: %s' % e)
   cleanup_and_exit(temp_dir, SAVE_ALWAYS or SAVE_FORENSICS)
+  cleanup_and_exit(temp_dir_b, SAVE_ALWAYS or SAVE_FORENSICS)
