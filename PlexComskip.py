@@ -221,13 +221,14 @@ try:
     #  attempting to add x264 compression to the stripped commercial file before overiding the origional
     #  ffmpeg -i input -c:v libx264 -preset slow -crf 22 -c:a copy output.mkv
     #
-    cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', os.path.join(temp_dir2, video_basename)]
-    logging.info('[ffmpeg] Command: %s' % cmd)
-    subprocess.call(cmd)
+    # cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v', 'libx264', '-preset', 'slow', '-crf', '22', '-c:a', 'copy', os.path.join(temp_dir2, video_basename)]
+    # logging.info('[ffmpeg] Command: %s' % cmd)
+    # subprocess.call(cmd)
     #
     #
   
-    shutil.copy(os.path.join(temp_dir2, video_basename), original_video_dir)
+    # shutil.copy(os.path.join(temp_dir2, video_basename), original_video_dir)
+    shutil.copy(os.path.join(temp_dir, video_basename), original_video_dir)
     cleanup_and_exit(temp_dir, SAVE_ALWAYS)
     cleanup_and_exit(temp_dir2, SAVE_ALWAYS)
   else:
