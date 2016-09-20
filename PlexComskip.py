@@ -219,7 +219,7 @@ try:
     #  attempting to add x264 compression to the stripped commercial file before overiding the origional
     #  ffmpeg -i inputfile.mkv -crf 18 -map 0 -acodec copy -scodec copy -c:v libx264 -threads 0 -preset veryslow outputfile.mkv
     #
-    cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-crf', '20', '-map', '0', '-acodec', 'copy', '-scodec', 'cpoy', '-c:v', 'libx264', '-threads', '0', '-preset', 'medium', os.path.join(temp_dir_b, video_basename)]
+    cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-crf', '20', '-map', '0', '-acodec', 'copy', '-scodec', 'copy', '-c:v', 'libx264', '-threads', '0', '-preset', 'medium', os.path.join(temp_dir_b, video_basename)]
     subprocess.call(cmd)
     #
     #
