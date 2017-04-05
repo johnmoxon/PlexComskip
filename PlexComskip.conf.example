@@ -25,6 +25,9 @@ console-logging: True
 # Specify temp dir for ffmpeg x264 compression different from temp_root
 # temp-root_b: /mnt/fast/tmp2
 
+# Transcoder options to further customize ffmpeg x264 compression options 
+# trans-options: 
+
 # Should we copy the original file to the temp directory? Useful if disk access to the original is slower than your temp location. Defaults to False.
 copy-original: False
 
