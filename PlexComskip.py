@@ -32,7 +32,7 @@ TEMP_ROOT_b = os.path.expandvars(os.path.expanduser(config.get('File Manipulatio
 COPY_ORIGINAL = config.getboolean('File Manipulation', 'copy-original')
 SAVE_ALWAYS = config.getboolean('File Manipulation', 'save-always')
 SAVE_FORENSICS = config.getboolean('File Manipulation', 'save-forensics')
-TRANS_OPTIONS = config.getboolean('Transcoder Options', 'trans-options')
+TRANS_OPTIONS = os.path.expandvars(os.path.expanduser(config.get('File Manipulation', 'trans-options')))
 
 # Logging.
 session_uuid = str(uuid.uuid4())
@@ -219,8 +219,10 @@ try:
     #
     #  attempting to add x264 compression to the stripped commercial file before overiding the origional
     #  ffmpeg -i inputfile.mkv -crf 18 -map 0 -acodec copy -scodec copy -c:v libx264 -threads 0 -preset veryslow outputfile.mkv
+    #  
+    #  -c:v libx264 -preset slow -sn -crf $TVQUAL -profile:v high -vf scale=720:400 -codec:a aac -ac 2 -ar 44100 -b:a 128k" 
     #
-    cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-vf', 'yadif=0:-1:1', '-crf', '20', '-map', '0', '-acodec', 'copy', '-scodec', 'copy', '-c:v', 'libx264', '-threads', '0', '-preset', 'medium', os.path.join(temp_dir_b, video_basename)]
+    cmd = [FFMPEG_PATH, '-i', os.path.join(temp_dir, video_basename), '-c:v', 'libx264', '-preset', 'slow', '-sn', '-crf', '20', '-profile:v', 'high', '-vf', 'yadif=0:-1:1', '-vf', 'scale=720:400', '-map', '0', '-codec:a', 'aac', '-ac', '2', '-ar', '44100', '-b:a', '128k', os.path.join(temp_dir_b, video_basename)]
     subprocess.call(cmd)
     #
     #
